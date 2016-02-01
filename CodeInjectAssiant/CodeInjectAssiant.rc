@@ -72,7 +72,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\CodeInjectAssiant.ico"
 IDI_PROCLIST            ICON                    "E:\\SecurityDevelope\\Refrence_code\\list.ico"
-IDI_DRAG1               ICON                    "E:\\SecurityDevelope\\Refrence_code\\drag.ico"
+IDI_DRAG1               ICON                    "res\\drag.ico"
 IDI_DRAG2               ICON                    "E:\\SecurityDevelope\\Refrence_code\\drag2.ico"
 IDI_EYE                 ICON                    "E:\\SecurityDevelope\\Refrence_code\\eye.ico"
 

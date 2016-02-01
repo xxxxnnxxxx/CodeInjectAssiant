@@ -294,6 +294,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\drag.ico"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Refrence_code\drag2.ico"
 				>
 			</File>

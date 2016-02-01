@@ -1,0 +1,6 @@
+/Bin/
+/test/
+/test_inject_app/
+*.suo
+*.sln
+*.ncb
