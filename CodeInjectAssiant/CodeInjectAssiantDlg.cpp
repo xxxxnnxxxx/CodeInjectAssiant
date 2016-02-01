@@ -594,7 +594,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
     }
 	catch(...)
     {
-        log_printf("[!]---------------远程进程分配空间出错，检查是否进程存在----------------------");
+        log_printf("[!]----------远程进程分配空间出错，检查是否进程存在----------");
         return;
     }
 }
@@ -609,17 +609,17 @@ void CCodeInjectAssiantDlg::OnClick_Execute()
         {   
             hRemoteThread=CreateRemoteThread(m_hProcess,NULL,0,(LPTHREAD_START_ROUTINE)m_pAddrOfInject,NULL,0,NULL);
             if(hRemoteThread==NULL)
-                log_printf("[!]-------------------CreateRemoteThread:failed---------------------");
+                log_printf("[!]----------CreateRemoteThread:failed----------");
             else
-                log_printf("[*]-----------------CreateRemoteThread:success ThreadHandle:0x%0x---------------",hRemoteThread);
+                log_printf("[*]----------CreateRemoteThread:success ThreadHandle:0x%0x----------",hRemoteThread);
         }
         else{
-            log_printf("[!]-------------------you must choose a method for injecting---------------------");
+            log_printf("[!]----------you must choose a method for injecting----------");
         }
     }
 	catch(...)
     {
-        log_printf("[!]---------------执行远程代码出错，检查是否进程存在----------------------");
+        log_printf("[!]----------执行远程代码出错，检查是否进程存在----------");
         return;
     }
 }
