@@ -54,6 +54,7 @@
 				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
+				WarnAsError="true"
 				DebugInformationFormat="4"
 				CompileAs="0"
 			/>

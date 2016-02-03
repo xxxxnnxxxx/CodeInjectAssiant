@@ -205,47 +205,24 @@ HCURSOR CCodeInjectAssiantDlg::OnQueryDragIcon()
 extern HWND g_hWnd;
 void CCodeInjectAssiantDlg::OnTimer(UINT nIDEvent) 
 {
-	// TODO: Add your message handler code here and/or call default
 	POINT pnt;
-
 	RECT rc;
-	HWND DeskHwnd = ::GetDesktopWindow();    //取得桌面句柄
-	HDC DeskDC = ::GetWindowDC(DeskHwnd);     //取得桌面设备场景
-
+	HWND DeskHwnd = ::GetDesktopWindow();       //取得桌面句柄
+	HDC DeskDC = ::GetWindowDC(DeskHwnd);       //取得桌面设备场景
 	int oldRop2 = SetROP2(DeskDC, R2_NOTXORPEN);
-	::GetCursorPos(&pnt);                //取得鼠标坐标
-	HWND UnHwnd = ::WindowFromPoint(pnt) ;    //取得鼠标指针处窗口句柄
+    RECT currentRc; //the current window's rect
 
-	g_hWnd=UnHwnd;
-	HWND grayHwnd = ::GetWindow(g_hWnd, GW_CHILD);
-	RECT tempRc;
-	BOOL bFind=FALSE;
-	while (grayHwnd)
-	{
-		::GetWindowRect(grayHwnd, &tempRc);
-		if(::PtInRect(&tempRc,pnt))
-		{
-			bFind = TRUE;
-			break;
-		}
-		else
-			grayHwnd = ::GetWindow(grayHwnd, GW_HWNDNEXT);
+    this->GetWindowRect(&currentRc);
+	::GetCursorPos(&pnt);                       //取得鼠标坐标
+	g_hWnd= ::WindowFromPoint(pnt) ;            //取得鼠标指针处窗口句柄
+    
+    if(::PtInRect(&currentRc,pnt))
+        goto dail;
 
-	}//while
-	if(bFind == TRUE)
-	{
-		bFind= FALSE;
-		g_hWnd = grayHwnd;
-	}
-	else
-		;//Wnd=UnHwnd
-
-	::GetWindowRect(g_hWnd, &rc);      //'获得窗口矩形
+	::GetWindowRect(g_hWnd, &rc);               //获得窗口矩形
 
 	if( rc.left < 0 ) rc.left = 0;
 	if (rc.top < 0 ) rc.top = 0;
-	//If() rc.Right > Screen.Width / 15 Then rc.Right = Screen.Width / 15
-	//If rc.Bottom > Screen.Height / 15 Then rc.Bottom = Screen.Height / 15
 	HPEN newPen = ::CreatePen(0, 3, RGB(125,0,125));    //建立新画笔,载入DeskDC
 	HGDIOBJ oldPen = ::SelectObject(DeskDC, newPen);
 	::Rectangle(DeskDC, rc.left, rc.top, rc.right, rc.bottom);  //在指示窗口周围显示闪烁矩形
@@ -260,7 +237,7 @@ void CCodeInjectAssiantDlg::OnTimer(UINT nIDEvent)
 	DeskDC = NULL;
 
 
-
+dail:
 	CDialog::OnTimer(nIDEvent);
 }
 
