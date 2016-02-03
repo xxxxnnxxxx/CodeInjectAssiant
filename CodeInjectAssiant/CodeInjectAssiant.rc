@@ -71,10 +71,10 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\CodeInjectAssiant.ico"
-IDI_PROCLIST            ICON                    "E:\\SecurityDevelope\\Refrence_code\\list.ico"
+IDI_PROCLIST            ICON                    "res\\list.ico"
 IDI_DRAG1               ICON                    "res\\drag.ico"
-IDI_DRAG2               ICON                    "E:\\SecurityDevelope\\Refrence_code\\drag2.ico"
-IDI_EYE                 ICON                    "E:\\SecurityDevelope\\Refrence_code\\eye.ico"
+IDI_DRAG2               ICON                    "res\\drag2.ico"
+IDI_EYE                 ICON                    "res\\eye.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -202,7 +202,7 @@ END
 // Cursor
 //
 
-IDC_CURSOR1             CURSOR                  "E:\\SecurityDevelope\\Refrence_code\\eye.cur"
+IDC_CURSOR1             CURSOR                  "res\\eye.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //

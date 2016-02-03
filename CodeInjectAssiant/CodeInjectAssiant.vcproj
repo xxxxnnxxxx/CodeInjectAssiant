@@ -302,7 +302,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Refrence_code\eye.cur"
+				RelativePath=".\res\eye.cur"
 				>
 			</File>
 			<File
