@@ -1,6 +1,3 @@
-// MyPic.cpp : implementation file
-//
-
 #include "stdafx.h"
 #include "MyPic.h"
 #include "resource.h"
@@ -11,29 +8,22 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
-// CMyPic
-HWND g_hWnd;
-CMyPic::CMyPic()
-{
-}
 
-CMyPic::~CMyPic()
-{
-}
+HWND g_hWnd;
+CMyPic::CMyPic(){}
+
+CMyPic::~CMyPic(){}
 
 void CMyPic::setParentWnd(HWND hWnd){
 	m_parentwnd=hWnd;
 }
+
+
 BEGIN_MESSAGE_MAP(CMyPic, CStatic)
-	//{{AFX_MSG_MAP(CMyPic)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
-	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
-// CMyPic message handlers
 
 void CMyPic::OnLButtonDown(UINT nFlags, CPoint point) 
 {

@@ -1,12 +1,9 @@
-// DlgProcList.cpp : implementation file
-//
 
 #include "stdafx.h"
 #include "CodeInjectAssiant.h"
 #include "DlgProcList.h"
 #include "ntapi.h"
 
-// CDlgProcList dialog
 
 #define _get_proc_address(x,y,z) \
 	x=(z##_ptr)GetProcAddress(y,#z);\
@@ -55,7 +52,7 @@ BOOL CDlgProcList::OnInitDialog()
 	m_processlists.clear();
 
 	::CreateThread(NULL,0,GetProcLists_Thread,this,0,NULL);
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	return TRUE; 
 }
 
 BEGIN_MESSAGE_MAP(CDlgProcList, CDialog)
@@ -79,8 +76,6 @@ int CDlgProcList::InitNativeAPI()
 	return 1;
 }
 
-//获取进程列表
-
 DWORD WINAPI CDlgProcList::GetProcLists_Thread(LPVOID lpvoid){
 	CDlgProcList *pDlg=(CDlgProcList*)lpvoid;
 
@@ -99,20 +94,16 @@ void CDlgProcList::FillRecord2List(const char * procname,DWORD pid)
 	m_proclist.SetItemText(item,1,buf);
 }
 
-//枚举进程函数
+//enum processes
 void CDlgProcList::EnumProc2List()
 {
 	if(ZwQuerySystemInformation!=NULL){
-		// get default process heap handle
 		HANDLE hHeap = GetProcessHeap();
 
 		NTSTATUS Status;
 		ULONG cbBuffer = 0x8000;
 		PVOID pBuffer = NULL;
 
-		// it is difficult to predict what buffer size will be
-		// enough, so we start with 32K buffer and increase its
-		// size as needed
 		do
 		{
 			pBuffer = HeapAlloc(hHeap, 0, cbBuffer);
@@ -162,7 +153,6 @@ void CDlgProcList::EnumProc2List()
 	}
 
 
-	//填充列表
 	if(m_processlists.size()!=0){
 		std::map<std::string,DWORD>::iterator iter;
 		for(iter=m_processlists.begin();iter!=m_processlists.end();iter++){
@@ -172,18 +162,15 @@ void CDlgProcList::EnumProc2List()
 	}
 }
 
-//双击
+//double-click
 void CDlgProcList::OnNMDblclkLtProclist(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	char buf[50];
 	DWORD pid=0;
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
 	m_proclist.GetItemText(pNMItemActivate->iItem,1,buf,50);
 	pid=atoi(buf);
 	::SendMessageA(this->GetParent()->m_hWnd,WM_SENDPROCESSID,0,(LPARAM)pid);
-	
 	*pResult = 0;
-
 	OnCancel();
 }
