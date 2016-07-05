@@ -5,3 +5,4 @@
 *.sln
 *.ncb
 /injectdll/
+/Debug/
