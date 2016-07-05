@@ -14,9 +14,15 @@ public:
 
 	enum { IDD = IDD_CODEINJECTASSIANT_DIALOG };
 
+    enum{
+        LOG_SUCCESS,
+        LOG_WARNING,
+        LOG_ERROR,
+    };
+
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
-	void _cdecl log_printf(char*,...);
+	void _cdecl log_printf(ULONG type,char*,...);
 
 // й╣ож
 protected:
@@ -40,9 +46,9 @@ protected:
 	ZwQueryInformationProcess_ptr ZwQueryInformationProcess;
 
 	virtual BOOL OnInitDialog();
-	void OnOK();
-	void OnCancel();
-	int Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t len);
+	void    OnOK();
+	void    OnCancel();
+	int     Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t len);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();

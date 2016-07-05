@@ -241,31 +241,43 @@ dail:
 	CDialog::OnTimer(nIDEvent);
 }
 
-void _cdecl CCodeInjectAssiantDlg::log_printf(char*format,...)
+void _cdecl CCodeInjectAssiantDlg::log_printf(ULONG type,char*format,...)
 {
     va_list args;
     int     len;
     char    *buffer;
     CString strLog;
+    CString strTmp;
 
-    // retrieve the variable arguments
+    switch(type)
+    {
+    case LOG_SUCCESS:
+        strTmp=_T("[*]----");
+        break;
+    case LOG_ERROR:
+        strTmp=_T("[!]----");
+        break;
+    case LOG_WARNING:
+        strTmp=_T("[?]----");
+        break;
+    }
+
+
     va_start( args, format );
 
-    len = _vscprintf( format, args ) // _vscprintf doesn't count
-        + 1; // terminating '\0'
-
-    buffer = (char*)malloc( len * sizeof(char) +3);
-    vsprintf( buffer, format, args ); // C4996
-    strcat(buffer,"\r\n");
-    //获取到对话窗的内容
+    len = _vscprintf( format, args ); 
+    buffer = (char*)malloc( (len+3) * sizeof(char));
+    vsprintf_s( buffer,len+3, format, args ); // C4996
+    strcat_s(buffer,len+3,"\r\n");
+    strTmp+=CString(buffer);
 
     this->GetDlgItemText(IDC_ET_LOG,strLog);
-    strLog+=CString(buffer);
+    strLog+=strTmp;
 
     this->SetDlgItemText(IDC_ET_LOG,strLog);
 
-
-    free( buffer );
+    if(buffer!=NULL)
+        free( buffer );
 
 }
 
@@ -350,8 +362,6 @@ void CCodeInjectAssiantDlg::OnOpenDllorBin()
 		ofn.lpstrFilter="All\0*.*\0";
 		ofn.lpstrTitle="打开一个Bin文件";
 		ofn.hInstance=::AfxGetApp()->m_hInstance;
-
-		//如果选择了hex显示，显示在hex控件中
 	}
 
 	if(GetOpenFileNameA(&ofn))
@@ -433,7 +443,7 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 	
 		dwret=GetProcessImageFileNameA((HMODULE)m_hProcess,szProcessPath,1024);
 		if(!dwret){
-            log_printf("[!]-----------get the path of the process failed-----------------");
+            log_printf(LOG_ERROR,"获取进程路径失败");
             return 0L;
 		}
 		//获取名称
@@ -442,7 +452,7 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 			this->SetDlgItemText(IDC_ET_PROCINFO,processname);
 		}
 
-        log_printf("[*]-----------get the path of %s success-----------------",processname);
+        log_printf(LOG_SUCCESS,"得到进程:%s",processname);
 	}
 	
 	return 0L;
@@ -452,7 +462,6 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 
 int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t len)
 {
-	int ret=0;
 	int current_size=0;
 	char opcode[50]={0};
 	char code[40]={0};
@@ -462,7 +471,7 @@ int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t l
 	this->GetDlgItemText(IDC_EDITOR,strAsm);
 	strAsm.Trim();
 	if(strAsm.IsEmpty()){
-		log_printf("[!]-----------请在编辑窗口填写适当的汇编代码,来完成注入-----------");
+		log_printf(LOG_WARNING,"请在编辑窗口填写适当的汇编代码,来完成注入");
 		return 0;
 	}
 	for(i=0;i<m_codeedit.GetLineCount();i++){
@@ -477,8 +486,7 @@ int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t l
 		}
 
 	}
-	ret=current_size;
-	return ret;
+	return current_size;
 }
 //主要过程注入
 void CCodeInjectAssiantDlg::OnClick_Inject()
@@ -502,7 +510,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 				    m_pImageBaseAddress=peb.ImageBaseAddress;
 			    }
 			    else{
-				     log_printf("[!]-----------远程进程分配空间出错，检查是否进程存在-----------");
+				     log_printf(LOG_ERROR,"远程进程分配空间出错，检查是否进程存在");
                      return;
 			    }
 
@@ -514,15 +522,16 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 
                 bRet=FALSE;
                 if(m_bHex)
-                {//用十六进制编辑    
-                    if(m_HexData_Len!=0 && m_pHexData!=NULL){
-                        m_RemoteMemoryLen=m_HexData_Len;    //全局变量
+                {   
+                    if(m_HexData_Len!=0 && m_pHexData!=NULL)
+                    {
+                        m_RemoteMemoryLen=m_HexData_Len;
                         bRet=TRUE;
                         pSourceBuf=m_pHexData;
                     }
                 }
                 else if(m_bInjectDll)
-                {//注入dll
+                {
                     if(!m_cs_dllpath.IsEmpty())
                     {
                         char *pBuf=NULL;
@@ -534,34 +543,38 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                         bRet=TRUE;
                         pSourceBuf=proc_bin;
                     }
-                    else{
-                        log_printf("[!]----------请输入一个有效的dll文件-----------");
+                    else
+                    {
+                        log_printf(LOG_ERROR,"请输入一个有效的DLL文件");
                     }
                 }
                 else
-                {//汇编代码编辑
+                {
                     
                     m_RemoteMemoryLen=Text2Bin((DWORD)m_pImageBaseAddress,opcode,1024);
                     if(m_RemoteMemoryLen!=0){
                         bRet=TRUE;
                         pSourceBuf=(LPBYTE)opcode;
                     }
+                    else
+                    {
+                        log_printf(LOG_ERROR,"请输入一个有效的BIN文件");
+                    }
                 }
-                //分配内存并写入
+                
                 if(bRet)
                 {
-                    //分配空间，注入执行
                     char str[50]={0};
                     m_pAddrOfInject=VirtualAllocEx(m_hProcess,NULL,m_RemoteMemoryLen,MEM_COMMIT,PAGE_EXECUTE_READWRITE);
                     wsprintfA(str,"0x%08x",(DWORD)m_pAddrOfInject);
                     this->SetDlgItemText(IDC_ET_ADDRESS,str);
                     bRet=WriteProcessMemory(m_hProcess,m_pAddrOfInject,pSourceBuf,m_RemoteMemoryLen,&dwSize);
                     if(bRet)
-                    {//写入内存成功
-                        log_printf("[*]----------WriteProcessMemory:0x%0x------------",m_pAddrOfInject);
+                    {
+                        log_printf(LOG_SUCCESS,"WriteProcessMemory:0x%0x",m_pAddrOfInject);
                     }
-                    else{//写入内存失败
-                        log_printf("[!]----------WriteProcessMemory:failed-----------");
+                    else{
+                        log_printf(LOG_ERROR,"WriteProcessMemory:失败");
                     }
                 }
                 
@@ -571,7 +584,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
     }
 	catch(...)
     {
-        log_printf("[!]----------远程进程分配空间出错，检查是否进程存在----------");
+        log_printf(LOG_ERROR,"远程进程分配空间出错，检查是否进程存在");
         return;
     }
 }
@@ -586,17 +599,17 @@ void CCodeInjectAssiantDlg::OnClick_Execute()
         {   
             hRemoteThread=CreateRemoteThread(m_hProcess,NULL,0,(LPTHREAD_START_ROUTINE)m_pAddrOfInject,NULL,0,NULL);
             if(hRemoteThread==NULL)
-                log_printf("[!]----------CreateRemoteThread:failed----------");
+                log_printf(LOG_ERROR,"CreateRemoteThread:failed");
             else
-                log_printf("[*]----------CreateRemoteThread:success ThreadHandle:0x%0x----------",hRemoteThread);
+                log_printf(LOG_SUCCESS,"CreateRemoteThread:success ThreadHandle:0x%0x",hRemoteThread);
         }
         else{
-            log_printf("[!]----------you must choose a method for injecting----------");
+            log_printf(LOG_WARNING,"请选择一种注入方法");
         }
     }
 	catch(...)
     {
-        log_printf("[!]----------执行远程代码出错，检查是否进程存在----------");
+        log_printf(LOG_ERROR,"执行远程代码出错，检查是否进程存在");
         return;
     }
 }
