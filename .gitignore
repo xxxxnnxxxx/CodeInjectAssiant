@@ -4,3 +4,4 @@
 *.suo
 *.sln
 *.ncb
+/injectdll/
