@@ -213,6 +213,20 @@ IDR_HTML_DLGPROCLIST    HTML                    "DlgProcList.htm"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Menu
+//
+
+IDR_POPMENU MENU 
+BEGIN
+    POPUP "PROCLIST"
+    BEGIN
+        MENUITEM "Ë¢ÐÂ",                          ID_PROCLIST_REFRESH
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 

@@ -14,6 +14,7 @@
 #define IDC_CURSOR1                     132
 #define IDI_EYE                         133
 #define IDD_DLG_PROCLIST                134
+#define IDR_POPMENU                     135
 #define IDC_ST_PROCLIST                 1000
 #define IDC_CK_HEX                      1001
 #define IDC_CK_DLL                      1003
@@ -32,13 +33,15 @@
 #define IDC_ET_LOG                      1015
 #define IDC_ET_HEXSIZE                  1016
 #define IDC_BT_BLANKHEX                 1019
+#define ID_PROCLIST_32771               32771
+#define ID_PROCLIST_REFRESH             32772
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
-#define _APS_NEXT_COMMAND_VALUE         32771
+#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           104
 #endif

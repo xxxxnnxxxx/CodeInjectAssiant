@@ -471,7 +471,6 @@ int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t l
 	this->GetDlgItemText(IDC_EDITOR,strAsm);
 	strAsm.Trim();
 	if(strAsm.IsEmpty()){
-		log_printf(LOG_WARNING,"请在编辑窗口填写适当的汇编代码,来完成注入");
 		return 0;
 	}
 	for(i=0;i<m_codeedit.GetLineCount();i++){
@@ -493,7 +492,8 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 {
 	//obtain the baseaddress of process
     try{
-            if(m_hProcess!=NULL){
+            if(m_hProcess!=NULL)
+            {
 		    PROCESS_BASIC_INFORMATION probaseinfo;
 		    DWORD dwRet=0;
             LPBYTE pSourceBuf=NULL;
@@ -558,7 +558,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     }
                     else
                     {
-                        log_printf(LOG_ERROR,"请输入一个有效的BIN文件");
+                        log_printf(LOG_WARNING,"请在编辑窗口填写适当的汇编代码,来完成注入");
                     }
                 }
                 
@@ -580,7 +580,11 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                 
 		    }
 
-	    }
+	    }//if(m_hProcess!=NULL)
+        else
+        {
+            log_printf(LOG_ERROR,"请选择要注入的进程");
+        }
     }
 	catch(...)
     {

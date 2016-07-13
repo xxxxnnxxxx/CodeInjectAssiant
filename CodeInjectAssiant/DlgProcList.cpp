@@ -57,6 +57,8 @@ BOOL CDlgProcList::OnInitDialog()
 
 BEGIN_MESSAGE_MAP(CDlgProcList, CDialog)
 	ON_NOTIFY(NM_DBLCLK, IDC_LT_PROCLIST, &CDlgProcList::OnNMDblclkLtProclist)
+    ON_NOTIFY(NM_RCLICK, IDC_LT_PROCLIST, &CDlgProcList::OnNMRClickLtProclist)
+    ON_COMMAND(ID_PROCLIST_REFRESH,OnRefreshList)
 END_MESSAGE_MAP()
 
 
@@ -173,4 +175,32 @@ void CDlgProcList::OnNMDblclkLtProclist(NMHDR *pNMHDR, LRESULT *pResult)
 	::SendMessageA(this->GetParent()->m_hWnd,WM_SENDPROCESSID,0,(LPARAM)pid);
 	*pResult = 0;
 	OnCancel();
+}
+
+void CDlgProcList::OnNMRClickLtProclist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    //弹出右键菜单
+    CMenu menu;  
+    VERIFY(menu.LoadMenu(IDR_POPMENU));  
+
+    CMenu* pPopup = menu.GetSubMenu(0);  
+    ASSERT(pPopup != NULL);  
+    CWnd* pWndPopupOwner = this; 
+
+    CPoint point;
+    GetCursorPos(&point);
+
+    pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y,  
+        pWndPopupOwner); 
+
+    *pResult = 0;
+}
+
+//刷新进程列表
+void CDlgProcList::OnRefreshList()
+{
+    m_processlists.clear();
+    m_proclist.DeleteAllItems();
+    ::CreateThread(NULL,0,GetProcLists_Thread,this,0,NULL);
 }

@@ -33,7 +33,10 @@ private:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnNMDblclkLtProclist(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnNMRClickLtProclist(NMHDR *pNMHDR, LRESULT *pResult);
 
+    //menu
+    afx_msg void OnRefreshList();   //刷新进程列表
 };
 
 
