@@ -492,27 +492,28 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 {
 	//obtain the baseaddress of process
     try{
-            if(m_hProcess!=NULL)
-            {
-		    PROCESS_BASIC_INFORMATION probaseinfo;
-		    DWORD dwRet=0;
+        if(m_hProcess!=NULL)
+        {
+	        PROCESS_BASIC_INFORMATION probaseinfo;
+	        DWORD dwRet=0;
             LPBYTE pSourceBuf=NULL;
             SIZE_T dwSize;
             BOOL bRet=FALSE;
             char opcode[1024]={0};
-		    _get_proc_address(ZwQueryInformationProcess,m_hNtdll,ZwQueryInformationProcess);
+	        _get_proc_address(ZwQueryInformationProcess,m_hNtdll,ZwQueryInformationProcess);
     		
-		    NTSTATUS status=ZwQueryInformationProcess(m_hProcess,ProcessBasicInformation,&probaseinfo,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
-		    if(status==0 && probaseinfo.PebBaseAddress!=0){
-			    PEB peb;
-			    bRet=::ReadProcessMemory(m_hProcess,probaseinfo.PebBaseAddress,&peb,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
-			    if(bRet){
-				    m_pImageBaseAddress=peb.ImageBaseAddress;
-			    }
-			    else{
-				     log_printf(LOG_ERROR,"远程进程分配空间出错，检查是否进程存在");
+	        NTSTATUS status=ZwQueryInformationProcess(m_hProcess,ProcessBasicInformation,&probaseinfo,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
+	        if(status==0 && probaseinfo.PebBaseAddress!=0)
+            {
+		        PEB peb;
+		        bRet=::ReadProcessMemory(m_hProcess,probaseinfo.PebBaseAddress,&peb,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
+		        if(bRet){
+			        m_pImageBaseAddress=peb.ImageBaseAddress;
+		        }
+		        else{
+			         log_printf(LOG_ERROR,"远程进程分配空间出错，检查是否进程存在");
                      return;
-			    }
+		        }
 
                 if(m_pAddrOfInject!=NULL && m_RemoteMemoryLen!=0){
                     VirtualFreeEx(m_hProcess,m_pAddrOfInject,m_RemoteMemoryLen,MEM_RELEASE);
@@ -526,6 +527,8 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     if(m_HexData_Len!=0 && m_pHexData!=NULL)
                     {
                         m_RemoteMemoryLen=m_HexData_Len;
+                        //重新获取一次，表示有可能十六进制代码被编辑过了
+                        m_hexedit.GetData(m_pHexData,m_HexData_Len);
                         bRet=TRUE;
                         pSourceBuf=m_pHexData;
                     }
@@ -578,7 +581,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     }
                 }
                 
-		    }
+	        }
 
 	    }//if(m_hProcess!=NULL)
         else
