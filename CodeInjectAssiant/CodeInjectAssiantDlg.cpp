@@ -281,6 +281,13 @@ void _cdecl CCodeInjectAssiantDlg::log_printf(ULONG type,char*format,...)
 
 }
 
+
+//
+void CCodeInjectAssiantDlg::log_printf(ULONG type,UINT strid)
+{
+
+}
+
 //
 void CCodeInjectAssiantDlg::OnOK(){}
 void CCodeInjectAssiantDlg::OnCancel(){ CDialog::OnCancel();}
