@@ -150,11 +150,11 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "nsh"
+            VALUE "CompanyName", "xxxxnnxxxx"
             VALUE "FileDescription", "CodeInjectAssiant"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "CodeInjectAssiant.exe"
-            VALUE "LegalCopyright", "nsh"
+            VALUE "LegalCopyright", "xxxxnnxxxx"
             VALUE "OriginalFilename", "CodeInjectAssiant.exe"
             VALUE "ProductName", "´úÂë×¢ÈëÖúÊÖ"
             VALUE "ProductVersion", "1.0.0.0"
@@ -203,13 +203,6 @@ END
 //
 
 IDC_CURSOR1             CURSOR                  "res\\eye.cur"
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// HTML
-//
-
-IDR_HTML_DLGPROCLIST    HTML                    "DlgProcList.htm"
 
 /////////////////////////////////////////////////////////////////////////////
 //

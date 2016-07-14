@@ -1,7 +1,3 @@
-
-// CodeInjectAssiant.cpp : 定义应用程序的类行为。
-//
-
 #include "stdafx.h"
 #include "CodeInjectAssiant.h"
 #include "CodeInjectAssiantDlg.h"

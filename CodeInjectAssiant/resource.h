@@ -7,7 +7,6 @@
 #define IDS_ABOUTBOX                    101
 #define IDD_CODEINJECTASSIANT_DIALOG    102
 #define IDS_PROCMSG_GETPATHFAILD        102
-#define IDR_HTML_DLGPROCLIST            103
 #define IDS_PROCMSG_GETNAME             103
 #define IDS_PROCMSG_ALLOCMEMFAILD       104
 #define IDS_TIP_SELECTDLL               105

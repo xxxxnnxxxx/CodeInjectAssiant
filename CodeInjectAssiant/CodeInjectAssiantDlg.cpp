@@ -70,9 +70,7 @@ void CCodeInjectAssiantDlg::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Check(pDX,IDC_CK_DLL,m_bInjectDll);
 	DDX_Check(pDX,IDC_CK_HEX,m_bHex);
-
 	DDX_Control(pDX,IDC_EDITOR,m_codeedit);
-
 	DDX_Control(pDX,IDC_ST_DRAG,m_wndselect);
 	DDX_Control(pDX,IDC_EDITOR_HEX,m_hexedit);
 }
@@ -181,28 +179,28 @@ HCURSOR CCodeInjectAssiantDlg::OnQueryDragIcon()
 extern HWND g_hWnd;
 void CCodeInjectAssiantDlg::OnTimer(UINT nIDEvent) 
 {
-	POINT pnt;
-	RECT rc;
-	HWND DeskHwnd = ::GetDesktopWindow();       //取得桌面句柄
-	HDC DeskDC = ::GetWindowDC(DeskHwnd);       //取得桌面设备场景
-	int oldRop2 = SetROP2(DeskDC, R2_NOTXORPEN);
-    RECT currentRc; //the current window's rect
+	POINT   pnt;
+	RECT    rc;
+	HWND    DeskHwnd    = ::GetDesktopWindow();
+	HDC     DeskDC      = ::GetWindowDC(DeskHwnd);
+	int     oldRop2     = SetROP2(DeskDC, R2_NOTXORPEN);
+    RECT    currentRc; 
 
     this->GetWindowRect(&currentRc);
-	::GetCursorPos(&pnt);                       //取得鼠标坐标
-	g_hWnd= ::WindowFromPoint(pnt) ;            //取得鼠标指针处窗口句柄
+	GetCursorPos(&pnt);
+	g_hWnd= ::WindowFromPoint(pnt) ;           
     
     if(::PtInRect(&currentRc,pnt))
         goto dail;
 
-	::GetWindowRect(g_hWnd, &rc);               //获得窗口矩形
+	::GetWindowRect(g_hWnd, &rc); 
 
 	if( rc.left < 0 ) rc.left = 0;
 	if (rc.top < 0 ) rc.top = 0;
 	HPEN newPen = ::CreatePen(0, 3, RGB(125,0,125));
 	HGDIOBJ oldPen = ::SelectObject(DeskDC, newPen);
 	::Rectangle(DeskDC, rc.left, rc.top, rc.right, rc.bottom);
-	Sleep(400);    //设置闪烁时间间隔
+    ::Sleep(400);
 	::Rectangle( DeskDC, rc.left, rc.top, rc.right, rc.bottom);
 
 	::SetROP2(DeskDC, oldRop2);
@@ -462,7 +460,8 @@ int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t l
 	}
 	return current_size;
 }
-//主要过程注入
+
+
 void CCodeInjectAssiantDlg::OnClick_Inject()
 {
 	//obtain the baseaddress of process
