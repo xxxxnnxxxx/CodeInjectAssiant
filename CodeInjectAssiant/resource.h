@@ -20,6 +20,9 @@
 #define IDS_TIP_CREATEREMOTETHREADSUCCESS 113
 #define IDS_OPFNAME_DLL                 114
 #define IDS_OPFNAME_BIN                 115
+#define IDS_BT_INJECTPROC               116
+#define IDS_BT_EXECUTE                  117
+#define IDS_BT_BLANKHEX                 118
 #define IDR_MAINFRAME                   128
 #define IDI_PROCLIST                    129
 #define IDI_DRAG1                       130

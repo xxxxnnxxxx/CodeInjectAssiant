@@ -3,9 +3,11 @@
 //
 
 #include "stdafx.h"
+#include <Shlwapi.h>
+#include <Psapi.h>
 #include "CodeInjectAssiant.h"
 #include "CodeInjectAssiantDlg.h"
-#include <Psapi.h>
+
 #include "proc.h"
 
 
@@ -118,6 +120,8 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+    InitControl();
+
 	m_wndselect.setParentWnd(m_hWnd);
 
 	((CEdit*)((this->GetDlgItem(IDC_EDITOR))))->ShowWindow(!m_bHex);
@@ -134,6 +138,33 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 	m_hNtdll=::GetModuleHandle("ntdll.dll");
 
 	return TRUE;
+}
+
+//
+struct _bt_pair_{
+    UINT strid;
+    UINT btid;
+}g_bt_pair[]={
+    {IDS_BT_INJECTPROC,IDC_BT_INJECT},
+    {IDS_BT_EXECUTE,IDC_BT_EXECUTE},
+    {IDS_BT_BLANKHEX,IDC_BT_BLANKHEX},
+    {0,0}
+};
+
+void CCodeInjectAssiantDlg::InitControl()
+{
+    struct _bt_pair_ *ppair=g_bt_pair;
+    int ret=0;
+    HINSTANCE hInst=AfxGetInstanceHandle();
+    for(;;)
+    {
+        if(ppair->btid==0 && ppair->strid==0)break;
+        char strWindowText[512]={0};
+        ret=::LoadStringA(hInst,ppair->strid,strWindowText,512); 
+        if(ret)this->SetDlgItemText(ppair->btid,strWindowText);
+
+        ppair++;
+    }
 }
 
 void CCodeInjectAssiantDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -183,7 +214,7 @@ void CCodeInjectAssiantDlg::OnTimer(UINT nIDEvent)
 	RECT    rc;
 	HWND    DeskHwnd    = ::GetDesktopWindow();
 	HDC     DeskDC      = ::GetWindowDC(DeskHwnd);
-	int     oldRop2     = SetROP2(DeskDC, R2_NOTXORPEN);
+	int     oldRop2     =   SetROP2(DeskDC, R2_NOTXORPEN);
     RECT    currentRc; 
 
     this->GetWindowRect(&currentRc);
@@ -266,7 +297,6 @@ void CCodeInjectAssiantDlg::OnCancel(){ CDialog::OnCancel();}
 
 
 //
-//选择是否注入Dll
 void CCodeInjectAssiantDlg::OnCkDll()
 {
 	UpdateData(TRUE);
@@ -278,7 +308,7 @@ void CCodeInjectAssiantDlg::OnCkDll()
     this->GetDlgItem(IDC_BT_SELECTFILE)->EnableWindow(m_bInjectDll);
 }
 
-//选择是否使用16进制显示
+
 void CCodeInjectAssiantDlg::OnCkHex()
 {
 	UpdateData(TRUE);
@@ -296,14 +326,17 @@ void CCodeInjectAssiantDlg::OnCkHex()
 void CCodeInjectAssiantDlg::OnClick_BlankHex()
 {
 	UpdateData(TRUE);
-	if(m_bHex){
-		if(m_pHexData!=NULL && m_HexData_Len!=0){
+	if(m_bHex)
+    {
+		if(m_pHexData!=NULL && m_HexData_Len!=0)
+        {
 			free(m_pHexData);
 			m_pHexData=NULL;
 			m_HexData_Len=0;
 		}
 		m_HexData_Len=this->GetDlgItemInt(IDC_ET_HEXSIZE);
-		if(m_HexData_Len!=0){
+		if(m_HexData_Len!=0)
+        {
 			m_pHexData=(LPBYTE)malloc(m_HexData_Len);
 			memset(m_pHexData,0,m_HexData_Len);
 			m_hexedit.Clear();
@@ -343,17 +376,19 @@ void CCodeInjectAssiantDlg::OnOpenDllorBin()
 	}
 
 	
-	//如果是显示Hex数据的话，直接读取文件到控件
-	if(m_bHex){
+	if(m_bHex)
+    {
 		m_hexedit.Clear();
-		if(m_pHexData!=NULL && m_HexData_Len!=0){
+		if(m_pHexData!=NULL && m_HexData_Len!=0)
+        {
 			free(m_pHexData);
 			m_pHexData=NULL;
 			m_HexData_Len=0;
 		}
 
 		HANDLE hFile=CreateFileA(szFileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
-		if(hFile!=INVALID_HANDLE_VALUE){
+		if(hFile!=INVALID_HANDLE_VALUE)
+        {
 			DWORD dwReaded=0;
 			DWORD filesize=0;
 			filesize=GetFileSize(hFile,NULL);
@@ -369,21 +404,16 @@ void CCodeInjectAssiantDlg::OnOpenDllorBin()
 		}
 	}
     else if(m_bInjectDll)
-    {//获取路径
+    {
         m_cs_dllpath=CString(szFileName);
     }
 }
 
 
-//选择进程
 void CCodeInjectAssiantDlg::OnSelectProcess()
 {
 	CDlgProcList dlg(this);
-	if(dlg.DoModal()==IDOK){
-		
-	}else{
-	
-	}
+	dlg.DoModal();
 }
 
 //
@@ -397,10 +427,13 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 
     this->SetDlgItemText(IDC_ET_LOG,"");
 
-	if(m_hProcess!=NULL){
-        if(m_pAddrOfInject!=NULL){
+	if(m_hProcess!=NULL)
+    {
+        if(m_pAddrOfInject!=NULL)
+        {
             VirtualFreeEx(m_hProcess,m_pAddrOfInject,m_RemoteMemoryLen,MEM_RELEASE);
-            if(m_pHexData!=NULL){
+            if(m_pHexData!=NULL)
+            {
                 free(m_pHexData);
                 m_pHexData=NULL;
                 m_RemoteMemoryLen=0;
@@ -410,21 +443,23 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 		CloseHandle(m_hProcess);
 		m_hProcess=NULL;
 	}
-	//获取进程信息
+
 	m_hProcess=::OpenProcess(PROCESS_ALL_ACCESS,FALSE,procId);
-	if(m_hProcess!=NULL){
+	if(m_hProcess!=NULL)
+    {
 	
 		dwret=GetProcessImageFileNameA((HMODULE)m_hProcess,szProcessPath,1024);
-		if(!dwret){
+		if(!dwret)
+        {
             log_printf(LOG_ERROR,IDS_PROCMSG_GETPATHFAILD);
             return 0L;
 		}
-		//获取名称
-		char*processname=PathFindFileNameA(szProcessPath);
-		if(processname!=NULL){
+		
+        char*processname=PathFindFileNameA(szProcessPath);
+		if(processname!=NULL)
+        {
 			this->SetDlgItemText(IDC_ET_PROCINFO,processname);
 		}
-
         log_printf(LOG_SUCCESS,IDS_PROCMSG_GETNAME,processname);
 	}
 	
@@ -443,11 +478,14 @@ int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t l
 	CString strAsm;
 	this->GetDlgItemText(IDC_EDITOR,strAsm);
 	strAsm.Trim();
-	if(strAsm.IsEmpty()){
+	if(strAsm.IsEmpty())
+    {
 		return 0;
 	}
-	for(i=0;i<m_codeedit.GetLineCount();i++){
-		if(m_codeedit.GetLine(i,code,40)){
+	for(i=0;i<m_codeedit.GetLineCount();i++)
+    {
+		if(m_codeedit.GetLine(i,code,40))
+        {
 			memset(opcode,0,50);
 			int opcode_size=get_opcodefromasminst(imagebaseaddress,code,opcode);
 			if(opcode_size!=0)
@@ -481,15 +519,18 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
             {
 		        PEB peb;
 		        bRet=::ReadProcessMemory(m_hProcess,probaseinfo.PebBaseAddress,&peb,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
-		        if(bRet){
+		        if(bRet)
+                {
 			        m_pImageBaseAddress=peb.ImageBaseAddress;
 		        }
-		        else{
-			         log_printf(LOG_ERROR,IDS_PROCMSG_ALLOCMEMFAILD);
-                     return;
+		        else
+                {
+			        log_printf(LOG_ERROR,IDS_PROCMSG_ALLOCMEMFAILD);
+                    return;
 		        }
 
-                if(m_pAddrOfInject!=NULL && m_RemoteMemoryLen!=0){
+                if(m_pAddrOfInject!=NULL && m_RemoteMemoryLen!=0)
+                {
                     VirtualFreeEx(m_hProcess,m_pAddrOfInject,m_RemoteMemoryLen,MEM_RELEASE);
                     m_pAddrOfInject=NULL;
                     m_RemoteMemoryLen=0;
@@ -528,7 +569,8 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                 {
                     
                     m_RemoteMemoryLen=Text2Bin((DWORD)m_pImageBaseAddress,opcode,1024);
-                    if(m_RemoteMemoryLen!=0){
+                    if(m_RemoteMemoryLen!=0)
+                    {
                         bRet=TRUE;
                         pSourceBuf=(LPBYTE)opcode;
                     }
@@ -549,7 +591,8 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     {
                         log_printf(LOG_SUCCESS,IDS_TIP_WRITEPROCESSMEMORY,m_pAddrOfInject);
                     }
-                    else{
+                    else
+                    {
                         log_printf(LOG_ERROR,IDS_TIP_WRITEPROCESSMEMORYFAILD);
                     }
                 }
@@ -583,7 +626,8 @@ void CCodeInjectAssiantDlg::OnClick_Execute()
             else
                 log_printf(LOG_SUCCESS,IDS_TIP_CREATEREMOTETHREADSUCCESS,hRemoteThread);
         }
-        else{
+        else
+        {
             log_printf(LOG_WARNING,IDS_TIP_INJECTMETHOD);
         }
     }

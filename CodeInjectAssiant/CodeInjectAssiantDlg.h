@@ -48,6 +48,7 @@ protected:
 	ZwQueryInformationProcess_ptr ZwQueryInformationProcess;
 
 	virtual BOOL    OnInitDialog();
+            void    InitControl();  //³õÊ¼»¯¿Ø¼þ
     virtual void    DoDataExchange(CDataExchange* pDX);
 	        void    OnOK();
 	        void    OnCancel();

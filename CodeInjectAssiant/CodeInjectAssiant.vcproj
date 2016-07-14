@@ -141,6 +141,7 @@
 				DefaultCharIsUnsigned="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
+				WarnAsError="true"
 				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
@@ -291,11 +292,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\drag.ico"
+				RelativePath="..\..\Refrence_code\drag.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Refrence_code\drag.ico"
+				RelativePath=".\res\drag.ico"
 				>
 			</File>
 			<File
@@ -311,19 +312,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Refrence_code\eye.ico"
-				>
-			</File>
-			<File
 				RelativePath=".\res\eye.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\res\list.ico"
+				RelativePath="..\..\Refrence_code\eye.ico"
 				>
 			</File>
 			<File
 				RelativePath="..\..\Refrence_code\list.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\list.ico"
 				>
 			</File>
 		</Filter>
@@ -443,11 +444,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\DlgProcList.htm"
-			DeploymentContent="true"
-			>
-		</File>
 		<File
 			RelativePath=".\ReadMe.md"
 			>

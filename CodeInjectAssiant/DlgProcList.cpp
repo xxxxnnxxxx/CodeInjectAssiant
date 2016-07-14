@@ -99,7 +99,8 @@ void CDlgProcList::FillRecord2List(const char * procname,DWORD pid)
 //enum processes
 void CDlgProcList::EnumProc2List()
 {
-	if(ZwQuerySystemInformation!=NULL){
+	if(ZwQuerySystemInformation!=NULL)
+    {
 		HANDLE hHeap = GetProcessHeap();
 
 		NTSTATUS Status;
@@ -155,10 +156,11 @@ void CDlgProcList::EnumProc2List()
 	}
 
 
-	if(m_processlists.size()!=0){
+	if(m_processlists.size()!=0)
+    {
 		std::map<std::string,DWORD>::iterator iter;
-		for(iter=m_processlists.begin();iter!=m_processlists.end();iter++){
-		
+		for(iter=m_processlists.begin();iter!=m_processlists.end();iter++)
+        {
 			FillRecord2List(iter->first.c_str(),iter->second);
 		}
 	}
@@ -180,7 +182,6 @@ void CDlgProcList::OnNMDblclkLtProclist(NMHDR *pNMHDR, LRESULT *pResult)
 void CDlgProcList::OnNMRClickLtProclist(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-    //弹出右键菜单
     CMenu menu;  
     VERIFY(menu.LoadMenu(IDR_POPMENU));  
 
@@ -197,7 +198,7 @@ void CDlgProcList::OnNMRClickLtProclist(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
 }
 
-//刷新进程列表
+
 void CDlgProcList::OnRefreshList()
 {
     m_processlists.clear();
