@@ -233,6 +233,25 @@ END
 STRINGTABLE 
 BEGIN
     IDS_ABOUTBOX            "关于 CodeInjectAssiant(&A)..."
+    IDS_PROCMSG_GETPATHFAILD "获取进程路径失败"
+    IDS_PROCMSG_GETNAME     "得到进程:%s"
+    IDS_PROCMSG_ALLOCMEMFAILD "远程进程分配空间出错，检查是否进程存在"
+    IDS_TIP_SELECTDLL       "请输入一个有效的DLL文件"
+    IDS_TIP_WRITEASM        "请在编辑窗口填写适当的汇编代码,来完成注入"
+    IDS_TIP_SELECTPROC      "请选择要注入的进程"
+    IDS_TIP_INJECTMETHOD    "请选择一种注入方法"
+    IDS_TIP_RUNFAILD        "执行远程代码出错，检查是否进程存在"
+    IDS_TIP_WRITEPROCESSMEMORY "WriteProcessMemory:0x%0x"
+    IDS_TIP_WRITEPROCESSMEMORYFAILD "WriteProcessMemory:失败"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TIP_CREATEREMOTETHREADFAILD "CreateRemoteThread:failed"
+    IDS_TIP_CREATEREMOTETHREADSUCCESS 
+                            "CreateRemoteThread:Success ThreadHandle:0x%0x"
+    IDS_OPFNAME_DLL         "打开注入的Dll"
+    IDS_OPFNAME_BIN         "打开注入的Bin"
 END
 
 #endif    // Chinese (P.R.C.) resources

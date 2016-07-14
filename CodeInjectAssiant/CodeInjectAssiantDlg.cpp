@@ -15,15 +15,10 @@
 	if(x==NULL)\
 	return; 
 
-
-// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
-
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
-
-// 对话框数据
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
@@ -45,12 +40,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
-
-
-// CCodeInjectAssiantDlg 对话框
-
-
-
 
 CCodeInjectAssiantDlg::CCodeInjectAssiantDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CCodeInjectAssiantDlg::IDD, pParent),m_bHex(0),m_bInjectDll(0),m_hProcess(NULL),m_pHexData(NULL),
@@ -111,9 +100,6 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// 将“关于...”菜单项添加到系统菜单中。
-
-	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -131,8 +117,6 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 		}
 	}
 
-	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
-	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
@@ -151,7 +135,7 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 	m_hexedit.SetBPR(16);
 	m_hNtdll=::GetModuleHandle("ntdll.dll");
 
-	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+	return TRUE;
 }
 
 void CCodeInjectAssiantDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -167,19 +151,14 @@ void CCodeInjectAssiantDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// 如果向对话框添加最小化按钮，则需要下面的代码
-//  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
-//  这将由框架自动完成。
-
 void CCodeInjectAssiantDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // 用于绘制的设备上下文
+		CPaintDC dc(this);
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// 使图标在工作区矩形中居中
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -187,7 +166,6 @@ void CCodeInjectAssiantDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// 绘制图标
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -196,8 +174,6 @@ void CCodeInjectAssiantDlg::OnPaint()
 	}
 }
 
-//当用户拖动最小化窗口时系统调用此函数取得光标
-//显示。
 HCURSOR CCodeInjectAssiantDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -223,10 +199,9 @@ void CCodeInjectAssiantDlg::OnTimer(UINT nIDEvent)
 
 	if( rc.left < 0 ) rc.left = 0;
 	if (rc.top < 0 ) rc.top = 0;
-	HPEN newPen = ::CreatePen(0, 3, RGB(125,0,125));    //建立新画笔,载入DeskDC
+	HPEN newPen = ::CreatePen(0, 3, RGB(125,0,125));
 	HGDIOBJ oldPen = ::SelectObject(DeskDC, newPen);
-	::Rectangle(DeskDC, rc.left, rc.top, rc.right, rc.bottom);  //在指示窗口周围显示闪烁矩形
-	//::Beep(100,100);
+	::Rectangle(DeskDC, rc.left, rc.top, rc.right, rc.bottom);
 	Sleep(400);    //设置闪烁时间间隔
 	::Rectangle( DeskDC, rc.left, rc.top, rc.right, rc.bottom);
 
@@ -241,54 +216,53 @@ dail:
 	CDialog::OnTimer(nIDEvent);
 }
 
-void _cdecl CCodeInjectAssiantDlg::log_printf(ULONG type,char*format,...)
+void _cdecl CCodeInjectAssiantDlg::log_printf(ULONG type,UINT strid_format,...)
 {
     va_list args;
     int     len;
     char    *buffer;
     CString strLog;
     CString strTmp;
+    char    szStr[512]={0};
+    int     ret=0;
 
-    switch(type)
+    ret=::LoadStringA(AfxGetInstanceHandle(),strid_format,szStr,500);
+    if(ret)
     {
-    case LOG_SUCCESS:
-        strTmp=_T("[*]----");
-        break;
-    case LOG_ERROR:
-        strTmp=_T("[!]----");
-        break;
-    case LOG_WARNING:
-        strTmp=_T("[?]----");
-        break;
+        switch(type)
+        {
+        case LOG_SUCCESS:
+            strTmp=_T("[*]----");
+            break;
+        case LOG_ERROR:
+            strTmp=_T("[!]----");
+            break;
+        case LOG_WARNING:
+            strTmp=_T("[?]----");
+            break;
+        }
+
+
+        va_start( args, strid_format );
+
+        len = _vscprintf( szStr, args ); 
+        buffer = (char*)malloc( (len+3) * sizeof(char));
+        vsprintf_s( buffer,len+3, szStr, args ); // C4996
+        strcat_s(buffer,len+3,"\r\n");
+        strTmp+=CString(buffer);
+
+        this->GetDlgItemText(IDC_ET_LOG,strLog);
+        strLog+=strTmp;
+
+        this->SetDlgItemText(IDC_ET_LOG,strLog);
+
+        if(buffer!=NULL)
+            free( buffer );
+
     }
 
-
-    va_start( args, format );
-
-    len = _vscprintf( format, args ); 
-    buffer = (char*)malloc( (len+3) * sizeof(char));
-    vsprintf_s( buffer,len+3, format, args ); // C4996
-    strcat_s(buffer,len+3,"\r\n");
-    strTmp+=CString(buffer);
-
-    this->GetDlgItemText(IDC_ET_LOG,strLog);
-    strLog+=strTmp;
-
-    this->SetDlgItemText(IDC_ET_LOG,strLog);
-
-    if(buffer!=NULL)
-        free( buffer );
-
 }
 
-
-//
-void CCodeInjectAssiantDlg::log_printf(ULONG type,UINT strid)
-{
-
-}
-
-//
 void CCodeInjectAssiantDlg::OnOK(){}
 void CCodeInjectAssiantDlg::OnCancel(){ CDialog::OnCancel();}
 
@@ -350,27 +324,21 @@ void CCodeInjectAssiantDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScro
 //
 void CCodeInjectAssiantDlg::OnOpenDllorBin()
 {
-	OPENFILENAME ofn;
+	OPENFILENAMEA ofn;
 	char szFileName[1024]={0};
-	memset(&ofn,0,sizeof(OPENFILENAME));
+    char szFilter[512]={0};
+    char szTitle[512]={0};
+    int  ret=0;
 
+
+	memset(&ofn,0,sizeof(OPENFILENAME));
 	ofn.lStructSize=sizeof(OPENFILENAME);
 	ofn.lpstrFile=szFileName;
 	ofn.nMaxFile=sizeof(szFileName);
 
-
-	if(m_bInjectDll){
-		ofn.lpstrFilter="Dll\0*.dll\0";
-		ofn.lpstrTitle="打开要注入的Dll";
-		ofn.hInstance=::AfxGetApp()->m_hInstance;
-	}
-	else{
-		
-		ofn.lpstrFilter="All\0*.*\0";
-		ofn.lpstrTitle="打开一个Bin文件";
-		ofn.hInstance=::AfxGetApp()->m_hInstance;
-	}
-
+    ret=::LoadStringA(AfxGetInstanceHandle(),m_bInjectDll?IDS_OPFNAME_DLL:IDS_OPFNAME_BIN,szTitle,512);
+    if(ret) ofn.lpstrTitle=szTitle;
+    ofn.hInstance=::AfxGetApp()->m_hInstance;
 	if(GetOpenFileNameA(&ofn))
 	{
 		this->SetDlgItemText(IDC_ET_FILEPATH,szFileName);
@@ -450,7 +418,7 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 	
 		dwret=GetProcessImageFileNameA((HMODULE)m_hProcess,szProcessPath,1024);
 		if(!dwret){
-            log_printf(LOG_ERROR,"获取进程路径失败");
+            log_printf(LOG_ERROR,IDS_PROCMSG_GETPATHFAILD);
             return 0L;
 		}
 		//获取名称
@@ -459,7 +427,7 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 			this->SetDlgItemText(IDC_ET_PROCINFO,processname);
 		}
 
-        log_printf(LOG_SUCCESS,"得到进程:%s",processname);
+        log_printf(LOG_SUCCESS,IDS_PROCMSG_GETNAME,processname);
 	}
 	
 	return 0L;
@@ -518,7 +486,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 			        m_pImageBaseAddress=peb.ImageBaseAddress;
 		        }
 		        else{
-			         log_printf(LOG_ERROR,"远程进程分配空间出错，检查是否进程存在");
+			         log_printf(LOG_ERROR,IDS_PROCMSG_ALLOCMEMFAILD);
                      return;
 		        }
 
@@ -534,7 +502,6 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     if(m_HexData_Len!=0 && m_pHexData!=NULL)
                     {
                         m_RemoteMemoryLen=m_HexData_Len;
-                        //重新获取一次，表示有可能十六进制代码被编辑过了
                         m_hexedit.GetData(m_pHexData,m_HexData_Len);
                         bRet=TRUE;
                         pSourceBuf=m_pHexData;
@@ -555,7 +522,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     }
                     else
                     {
-                        log_printf(LOG_ERROR,"请输入一个有效的DLL文件");
+                        log_printf(LOG_ERROR,IDS_TIP_SELECTDLL);
                     }
                 }
                 else
@@ -568,7 +535,7 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     }
                     else
                     {
-                        log_printf(LOG_WARNING,"请在编辑窗口填写适当的汇编代码,来完成注入");
+                        log_printf(LOG_WARNING,IDS_TIP_WRITEASM);
                     }
                 }
                 
@@ -581,10 +548,10 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     bRet=WriteProcessMemory(m_hProcess,m_pAddrOfInject,pSourceBuf,m_RemoteMemoryLen,&dwSize);
                     if(bRet)
                     {
-                        log_printf(LOG_SUCCESS,"WriteProcessMemory:0x%0x",m_pAddrOfInject);
+                        log_printf(LOG_SUCCESS,IDS_TIP_WRITEPROCESSMEMORY,m_pAddrOfInject);
                     }
                     else{
-                        log_printf(LOG_ERROR,"WriteProcessMemory:失败");
+                        log_printf(LOG_ERROR,IDS_TIP_WRITEPROCESSMEMORYFAILD);
                     }
                 }
                 
@@ -593,12 +560,12 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 	    }//if(m_hProcess!=NULL)
         else
         {
-            log_printf(LOG_ERROR,"请选择要注入的进程");
+            log_printf(LOG_ERROR,IDS_TIP_SELECTPROC);
         }
     }
 	catch(...)
     {
-        log_printf(LOG_ERROR,"远程进程分配空间出错，检查是否进程存在");
+        log_printf(LOG_ERROR,IDS_PROCMSG_ALLOCMEMFAILD);
         return;
     }
 }
@@ -613,17 +580,17 @@ void CCodeInjectAssiantDlg::OnClick_Execute()
         {   
             hRemoteThread=CreateRemoteThread(m_hProcess,NULL,0,(LPTHREAD_START_ROUTINE)m_pAddrOfInject,NULL,0,NULL);
             if(hRemoteThread==NULL)
-                log_printf(LOG_ERROR,"CreateRemoteThread:failed");
+                log_printf(LOG_ERROR,IDS_TIP_CREATEREMOTETHREADFAILD);
             else
-                log_printf(LOG_SUCCESS,"CreateRemoteThread:success ThreadHandle:0x%0x",hRemoteThread);
+                log_printf(LOG_SUCCESS,IDS_TIP_CREATEREMOTETHREADSUCCESS,hRemoteThread);
         }
         else{
-            log_printf(LOG_WARNING,"请选择一种注入方法");
+            log_printf(LOG_WARNING,IDS_TIP_INJECTMETHOD);
         }
     }
 	catch(...)
     {
-        log_printf(LOG_ERROR,"执行远程代码出错，检查是否进程存在");
+        log_printf(LOG_ERROR,IDS_TIP_RUNFAILD);
         return;
     }
 }

@@ -20,10 +20,11 @@ public:
         LOG_ERROR,
     };
 
+
+//method
 protected:
-	virtual void        DoDataExchange(CDataExchange* pDX);
-	        void _cdecl log_printf(ULONG type,char*,...);
-            void        log_printf(ULONG type,UINT strid);
+    void _cdecl log_printf(ULONG type,UINT strid_format,...);
+    
 
 // й╣ож
 protected:
@@ -47,6 +48,7 @@ protected:
 	ZwQueryInformationProcess_ptr ZwQueryInformationProcess;
 
 	virtual BOOL    OnInitDialog();
+    virtual void    DoDataExchange(CDataExchange* pDX);
 	        void    OnOK();
 	        void    OnCancel();
 	        int     Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t len);
