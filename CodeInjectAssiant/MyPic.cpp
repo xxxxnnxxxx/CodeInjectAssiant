@@ -42,34 +42,27 @@ void CMyPic::OnLButtonUp(UINT nFlags, CPoint point)
     POINT pt;
     DWORD procID=0;     //窗口所在进程
     DWORD curprocID=0;  //获取当前进程ID
-	RECT rc;
     BOOL bFind=FALSE;
-    CString strRect;
+    HICON hDrg;
+
+    GetCursorPos(&pt);
+    g_hWnd=::WindowFromPoint(pt);
 
 	ReleaseCapture();
-	HICON hicon1=LoadIcon(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_DRAG1));
-	this->SetIcon(hicon1);
+	hDrg=LoadIcon(AfxGetApp()->m_hInstance,MAKEINTRESOURCE(IDI_DRAG1));
+	this->SetIcon(hDrg);
 	
-	::GetCursorPos(&pt);
-	g_hWnd=::WindowFromPoint(pt);
+
 
 	
-	GetWindowThreadProcessId(g_hWnd,&procID);   //get process's id from the window
+    //判断不是当前进程
+	GetWindowThreadProcessId(g_hWnd,&procID);
     curprocID=GetCurrentProcessId();
-   
     if(procID==curprocID)
         goto dail;
-    
 
 	::PostMessageA(m_parentwnd,WM_SENDPROCESSID,0,(LPARAM)procID);
-
-	
-
-	::GetWindowRect(g_hWnd, &rc); 
-	
-	strRect.Format("(%d,%d),(%d,%d) %dx%d",rc.left,rc.top,rc.right,rc.bottom,rc.right-rc.left,rc.bottom-rc.top);
-	FromHandle(m_parentwnd)->KillTimer(1);
-
 dail:
+    FromHandle(m_parentwnd)->KillTimer(1);
 	CStatic::OnLButtonUp(nFlags, point);
 }
