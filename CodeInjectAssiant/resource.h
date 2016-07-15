@@ -21,8 +21,14 @@
 #define IDS_OPFNAME_DLL                 114
 #define IDS_OPFNAME_BIN                 115
 #define IDS_BT_INJECTPROC               116
-#define IDS_BT_EXECUTE                  117
-#define IDS_BT_BLANKHEX                 118
+#define IDS_BT_ALLOCMEM                 116
+#define IDS_BT_WRITEMEM                 117
+#define IDS_BT_EXECUTE                  118
+#define IDS_BT_BLANKHEX                 119
+#define IDS_TIP_ALLOCMEMSUCCESS         120
+#define IDS_TIP_ALLOCMEMFAILD           121
+#define IDS_TIP_READREMOTEPROC          122
+#define IDS_TIP_X64IGNORE               123
 #define IDR_MAINFRAME                   128
 #define IDI_PROCLIST                    129
 #define IDI_DRAG1                       130
@@ -40,6 +46,7 @@
 #define IDC_ST_DRAG                     1008
 #define IDC_ET_PROCINFO                 1009
 #define IDC_BT_INJECT                   1010
+#define IDC_BT_ALLOCMEM                 1010
 #define IDC_ET_ADDRESS                  1011
 #define IDC_BT_EXECUTE                  1012
 #define IDC_ET_PROCID                   1013
@@ -48,6 +55,7 @@
 #define IDC_EDIT1                       1015
 #define IDC_ET_LOG                      1015
 #define IDC_ET_HEXSIZE                  1016
+#define IDC_BT_WRITEMEM                 1017
 #define IDC_BT_BLANKHEX                 1019
 #define ID_PROCLIST_32771               32771
 #define ID_PROCLIST_REFRESH             32772
