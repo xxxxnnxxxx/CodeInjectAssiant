@@ -44,8 +44,11 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 CCodeInjectAssiantDlg::CCodeInjectAssiantDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CCodeInjectAssiantDlg::IDD, pParent),m_bHex(0),m_bInjectDll(0),m_hProcess(NULL),m_pHexData(NULL),
-	m_HexData_Len(0),m_RemoteMemoryLen(0),m_pAddrOfInject(NULL)
+	: CDialog(CCodeInjectAssiantDlg::IDD, pParent),m_bHex(0),m_bInjectDll(0),
+    m_hProcess(NULL),m_pHexData(NULL),
+	m_HexData_Len(0),m_RemoteMemoryLen(0),
+    m_pAddrOfInject(NULL),m_ExceuteEntity(NULL),
+    m_LenOfExecuteEntiry(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -88,9 +91,11 @@ BEGIN_MESSAGE_MAP(CCodeInjectAssiantDlg, CDialog)
 	ON_BN_CLICKED(IDC_BT_SELECTFILE,OnOpenDllorBin)
 	ON_BN_CLICKED(IDC_ST_PROCLIST,OnSelectProcess)
 	ON_MESSAGE(WM_SENDPROCESSID,OnObtainProcessID)
-	ON_BN_CLICKED(IDC_BT_INJECT,OnClick_Inject)
+	ON_BN_CLICKED(IDC_BT_ALLOCMEM,OnClick_AllocMem)
+    ON_BN_CLICKED(IDC_BT_WRITEMEM,OnClick_Writemem)
 	ON_BN_CLICKED(IDC_BT_EXECUTE,OnClick_Execute)
 	ON_BN_CLICKED(IDC_BT_BLANKHEX,OnClick_BlankHex)
+    
 END_MESSAGE_MAP()
 
 
@@ -121,6 +126,7 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
     InitControl();
+   
 
 	m_wndselect.setParentWnd(m_hWnd);
 
@@ -136,8 +142,13 @@ BOOL CCodeInjectAssiantDlg::OnInitDialog()
 	m_hexedit.SetOptions(1, 1, 1, 1);
 	m_hexedit.SetBPR(16);
 	m_hNtdll=::GetModuleHandle("ntdll.dll");
-
+    InitLibFuncs();
 	return TRUE;
+}
+
+void CCodeInjectAssiantDlg::InitLibFuncs()
+{
+    _get_proc_address(ZwQueryInformationProcess,m_hNtdll,ZwQueryInformationProcess);
 }
 
 //
@@ -145,7 +156,8 @@ struct _bt_pair_{
     UINT strid;
     UINT btid;
 }g_bt_pair[]={
-    {IDS_BT_INJECTPROC,IDC_BT_INJECT},
+    {IDS_BT_ALLOCMEM,IDC_BT_ALLOCMEM},
+    {IDS_BT_WRITEMEM,IDC_BT_WRITEMEM},
     {IDS_BT_EXECUTE,IDC_BT_EXECUTE},
     {IDS_BT_BLANKHEX,IDC_BT_BLANKHEX},
     {0,0}
@@ -416,6 +428,51 @@ void CCodeInjectAssiantDlg::OnSelectProcess()
 	dlg.DoModal();
 }
 
+int CCodeInjectAssiantDlg::Is_RemoteProcX64(HANDLE hProcess)
+{
+    DWORD dwRet=0;
+    BOOL bRet=FALSE;
+    char opcode[1024]={0};
+    PROCESS_BASIC_INFORMATION probaseinfo;
+    NTSTATUS status;
+    PVOID ImageBaseAddress=0;
+    int result=-1;
+    
+
+    /*
+    读取64位程序，ZwQueryInformationProcess会出错，所以直接就跳过
+    */
+    status=ZwQueryInformationProcess(m_hProcess,ProcessBasicInformation,&probaseinfo,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
+    if(status==0 && probaseinfo.PebBaseAddress!=0)
+    {
+        PEB peb;
+        bRet=::ReadProcessMemory(m_hProcess,probaseinfo.PebBaseAddress,&peb,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
+        if(bRet)
+        {
+            ImageBaseAddress=peb.ImageBaseAddress;
+
+            IMAGE_DOS_HEADER dosheader;
+            bRet=::ReadProcessMemory(m_hProcess,ImageBaseAddress,&dosheader,sizeof(IMAGE_DOS_HEADER),&dwRet);
+            if(bRet)
+            {
+                IMAGE_NT_HEADERS ntheaders;
+                bRet=::ReadProcessMemory(m_hProcess,(LPCVOID)((DWORD)ImageBaseAddress+dosheader.e_lfanew),&ntheaders,sizeof(IMAGE_NT_HEADERS),&dwRet);
+                if(bRet)
+                {
+                    if(ntheaders.OptionalHeader.Magic==IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+                        result=0;
+                    else if(ntheaders.OptionalHeader.Magic==IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+                        result=1;
+                }
+            }
+        }
+        
+    }
+
+    return result;
+
+}
+
 //
 LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 {
@@ -447,7 +504,24 @@ LRESULT CCodeInjectAssiantDlg::OnObtainProcessID(WPARAM wParam,LPARAM lParam)
 	m_hProcess=::OpenProcess(PROCESS_ALL_ACCESS,FALSE,procId);
 	if(m_hProcess!=NULL)
     {
-	
+
+	    error=Is_RemoteProcX64(m_hProcess);
+        if(error<0)
+        {
+            CloseHandle(m_hProcess);
+            m_hProcess=NULL;
+            log_printf(LOG_SUCCESS,IDS_TIP_READREMOTEPROC);
+            return 0L;
+        }
+        else if(error==1)
+        {
+            CloseHandle(m_hProcess);
+            m_hProcess=NULL;
+            log_printf(LOG_SUCCESS,IDS_TIP_X64IGNORE);
+            return 0L;
+        }
+
+
 		dwret=GetProcessImageFileNameA((HMODULE)m_hProcess,szProcessPath,1024);
 		if(!dwret)
         {
@@ -500,7 +574,7 @@ int CCodeInjectAssiantDlg::Text2Bin(DWORD imagebaseaddress,char *outbuf,size_t l
 }
 
 
-void CCodeInjectAssiantDlg::OnClick_Inject()
+void CCodeInjectAssiantDlg::OnClick_AllocMem()
 {
 	//obtain the baseaddress of process
     try{
@@ -508,11 +582,10 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
         {
 	        PROCESS_BASIC_INFORMATION probaseinfo;
 	        DWORD dwRet=0;
-            LPBYTE pSourceBuf=NULL;
-            SIZE_T dwSize;
             BOOL bRet=FALSE;
             char opcode[1024]={0};
-	        _get_proc_address(ZwQueryInformationProcess,m_hNtdll,ZwQueryInformationProcess);
+
+            m_ExceuteEntity=NULL;
     		
 	        NTSTATUS status=ZwQueryInformationProcess(m_hProcess,ProcessBasicInformation,&probaseinfo,sizeof(PROCESS_BASIC_INFORMATION),&dwRet);
 	        if(status==0 && probaseinfo.PebBaseAddress!=0)
@@ -536,15 +609,15 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     m_RemoteMemoryLen=0;
                 }
 
-                bRet=FALSE;
+                m_bReadytoExecute=FALSE;
                 if(m_bHex)
                 {   
                     if(m_HexData_Len!=0 && m_pHexData!=NULL)
                     {
                         m_RemoteMemoryLen=m_HexData_Len;
                         m_hexedit.GetData(m_pHexData,m_HexData_Len);
-                        bRet=TRUE;
-                        pSourceBuf=m_pHexData;
+                        m_bReadytoExecute=TRUE;
+                        m_ExceuteEntity=m_pHexData;
                     }
                 }
                 else if(m_bInjectDll)
@@ -557,8 +630,8 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                         pBuf=(char*)(proc_bin+(proc_bin_len-10*8));
                         memcpy(pBuf,m_cs_dllpath.GetBuffer(m_cs_dllpath.GetLength()),m_cs_dllpath.GetLength());
                         
-                        bRet=TRUE;
-                        pSourceBuf=proc_bin;
+                        m_bReadytoExecute=TRUE;
+                        m_ExceuteEntity=proc_bin;
                     }
                     else
                     {
@@ -571,30 +644,31 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
                     m_RemoteMemoryLen=Text2Bin((DWORD)m_pImageBaseAddress,opcode,1024);
                     if(m_RemoteMemoryLen!=0)
                     {
-                        bRet=TRUE;
-                        pSourceBuf=(LPBYTE)opcode;
+                        m_bReadytoExecute=TRUE;
+                        m_ExceuteEntity=(LPBYTE)opcode;
                     }
                     else
                     {
                         log_printf(LOG_WARNING,IDS_TIP_WRITEASM);
                     }
                 }
-                
-                if(bRet)
+
+                if(m_bReadytoExecute)
                 {
-                    char str[50]={0};
+                    
                     m_pAddrOfInject=VirtualAllocEx(m_hProcess,NULL,m_RemoteMemoryLen,MEM_COMMIT,PAGE_EXECUTE_READWRITE);
-                    wsprintfA(str,"0x%08x",(DWORD)m_pAddrOfInject);
-                    this->SetDlgItemText(IDC_ET_ADDRESS,str);
-                    bRet=WriteProcessMemory(m_hProcess,m_pAddrOfInject,pSourceBuf,m_RemoteMemoryLen,&dwSize);
-                    if(bRet)
+                    if(m_pAddrOfInject!=NULL)
                     {
-                        log_printf(LOG_SUCCESS,IDS_TIP_WRITEPROCESSMEMORY,m_pAddrOfInject);
+                        char str[50]={0};
+                        wsprintfA(str,"0x%08x",(DWORD)m_pAddrOfInject);
+                        this->SetDlgItemText(IDC_ET_ADDRESS,str); 
+                        log_printf(LOG_SUCCESS,IDS_TIP_ALLOCMEMSUCCESS);
                     }
                     else
                     {
-                        log_printf(LOG_ERROR,IDS_TIP_WRITEPROCESSMEMORYFAILD);
+                        log_printf(LOG_ERROR,IDS_TIP_ALLOCMEMFAILD);
                     }
+           
                 }
                 
 	        }
@@ -613,12 +687,34 @@ void CCodeInjectAssiantDlg::OnClick_Inject()
 }
 
 
+void CCodeInjectAssiantDlg::OnClick_Writemem()
+{
+    BOOL bRet=FALSE;
+    DWORD dwSize=0;
+    if(m_pAddrOfInject!=NULL && m_RemoteMemoryLen>0)
+    {
+        
+        bRet=WriteProcessMemory(m_hProcess,m_pAddrOfInject,m_ExceuteEntity,m_RemoteMemoryLen,&dwSize);
+        if(bRet)
+        {
+            log_printf(LOG_SUCCESS,IDS_TIP_WRITEPROCESSMEMORY,m_pAddrOfInject);
+        }
+        else
+        {
+            log_printf(LOG_ERROR,IDS_TIP_WRITEPROCESSMEMORYFAILD);
+        }
+    }
+}
+
+
 void CCodeInjectAssiantDlg::OnClick_Execute()
 {
     HANDLE hRemoteThread=NULL;
+    BOOL bRet=FALSE;
+    DWORD dwSize=0;
     try
     {
-        if(m_pAddrOfInject!=NULL)
+        if(m_pAddrOfInject!=NULL && m_RemoteMemoryLen>0)
         {   
             hRemoteThread=CreateRemoteThread(m_hProcess,NULL,0,(LPTHREAD_START_ROUTINE)m_pAddrOfInject,NULL,0,NULL);
             if(hRemoteThread==NULL)

@@ -22,8 +22,10 @@ public:
 
 
 //method
-protected:
+private:
+    void        InitLibFuncs();
     void _cdecl log_printf(ULONG type,UINT strid_format,...);
+    int         Is_RemoteProcX64(HANDLE hProcess);
     
 
 // 实现
@@ -40,10 +42,13 @@ protected:
 	LPBYTE      m_pHexData;
 	UINT        m_HexData_Len;
 	
-	HANDLE      m_hProcess;	//当前被打开的进程句柄
-	VOID *      m_pAddrOfInject;	//
+	HANDLE      m_hProcess;
+	VOID *      m_pAddrOfInject;
 	PVOID       m_pImageBaseAddress;
-    UINT        m_RemoteMemoryLen; //分配的远程进程的长度
+    UINT        m_RemoteMemoryLen;
+    BOOL        m_bReadytoExecute;
+    LPBYTE      m_ExceuteEntity;
+    size_t      m_LenOfExecuteEntiry;
 
 	ZwQueryInformationProcess_ptr ZwQueryInformationProcess;
 
@@ -64,9 +69,10 @@ protected:
 	afx_msg void    OnTimer(UINT nIDEvent);
 	afx_msg void    OnCkDll();	            //选择注入Dll
 	afx_msg void    OnCkHex();	            //使用Hex
-	afx_msg void    OnClick_Inject();	    //注入到进程
+	afx_msg void    OnClick_AllocMem();	    //注入到进程
+    afx_msg void    OnClick_Writemem();     //写入内存
 	afx_msg void    OnClick_Execute();	    //执行远程线程
-	afx_msg void    OnClick_BlankHex();	//创建空白数据
+	afx_msg void    OnClick_BlankHex(); 	//创建空白数据
 	afx_msg void    OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg LRESULT OnObtainProcessID(WPARAM wParam,LPARAM lParam);//处理获取进程ID的消息
     afx_msg void    OnBnClickedBtInject();
