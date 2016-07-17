@@ -6,3 +6,4 @@
 *.ncb
 /injectdll/
 /Debug/
+/test_propertysheet/
