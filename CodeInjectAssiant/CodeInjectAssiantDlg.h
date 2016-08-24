@@ -76,6 +76,9 @@ protected:
 	afx_msg void    OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg LRESULT OnObtainProcessID(WPARAM wParam,LPARAM lParam);//处理获取进程ID的消息
     afx_msg void    OnBnClickedBtInject();
+
+    afx_msg void    OnMenu_RemoteThreadInject();      //进程列表
+    afx_msg void    OnMenu_EntryInject();   //入口注入方式
 	DECLARE_MESSAGE_MAP()
 };
 

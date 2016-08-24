@@ -37,6 +37,7 @@
 #define IDI_EYE                         133
 #define IDD_DLG_PROCLIST                134
 #define IDR_POPMENU                     135
+#define IDR_MAINMENU                    136
 #define IDC_ST_PROCLIST                 1000
 #define IDC_CK_HEX                      1001
 #define IDC_CK_DLL                      1003
@@ -59,13 +60,20 @@
 #define IDC_BT_BLANKHEX                 1019
 #define ID_PROCLIST_32771               32771
 #define ID_PROCLIST_REFRESH             32772
+#define ID_32773                        32773
+#define ID_Menu                         32774
+#define ID_32775                        32775
+#define ID_MENU_PROSLIST                32776
+#define ID_MENU_PROFromWindow           32777
+#define ID_MENU_ENTRYINJECT             32778
+#define ID_MENU_REMOTETHREADINJECT      32779
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32773
+#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_COMMAND_VALUE         32780
 #define _APS_NEXT_CONTROL_VALUE         1020
 #define _APS_NEXT_SYMED_VALUE           104
 #endif

@@ -96,6 +96,8 @@ BEGIN_MESSAGE_MAP(CCodeInjectAssiantDlg, CDialog)
 	ON_BN_CLICKED(IDC_BT_EXECUTE,OnClick_Execute)
 	ON_BN_CLICKED(IDC_BT_BLANKHEX,OnClick_BlankHex)
     
+    ON_BN_CLICKED(ID_MENU_REMOTETHREADINJECT,OnMenu_RemoteThreadInject)
+    ON_BN_CLICKED(ID_MENU_ENTRYINJECT,OnMenu_EntryInject)
 END_MESSAGE_MAP()
 
 
@@ -732,4 +734,18 @@ void CCodeInjectAssiantDlg::OnClick_Execute()
         log_printf(LOG_ERROR,IDS_TIP_RUNFAILD);
         return;
     }
+}
+
+
+//进程列表
+void CCodeInjectAssiantDlg::OnMenu_RemoteThreadInject()
+{
+    OnSelectProcess();
+    return;
+}
+//入口点注入
+void CCodeInjectAssiantDlg::OnMenu_EntryInject()
+{
+    
+    return;
 }
