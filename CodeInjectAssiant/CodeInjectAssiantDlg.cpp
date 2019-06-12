@@ -7,6 +7,7 @@
 #include <Psapi.h>
 #include "CodeInjectAssiant.h"
 #include "CodeInjectAssiantDlg.h"
+#include "Dlg_About.h"
 
 #include "proc.h"
 
@@ -98,6 +99,7 @@ BEGIN_MESSAGE_MAP(CCodeInjectAssiantDlg, CDialog)
     
     ON_BN_CLICKED(ID_MENU_REMOTETHREADINJECT,OnMenu_RemoteThreadInject)
     ON_BN_CLICKED(ID_MENU_ENTRYINJECT,OnMenu_EntryInject)
+    ON_BN_CLICKED(ID_MENU_About, OnAbout)
 END_MESSAGE_MAP()
 
 
@@ -440,7 +442,6 @@ int CCodeInjectAssiantDlg::Is_RemoteProcX64(HANDLE hProcess)
     PVOID ImageBaseAddress=0;
     int result=-1;
     
-
     /*
     读取64位程序，ZwQueryInformationProcess会出错，所以直接就跳过
     */
@@ -745,7 +746,11 @@ void CCodeInjectAssiantDlg::OnMenu_RemoteThreadInject()
 }
 //入口点注入
 void CCodeInjectAssiantDlg::OnMenu_EntryInject()
-{
-    
+{    
     return;
+}
+// About
+void CCodeInjectAssiantDlg::OnAbout() {
+    Dlg_About dlg(this);
+    dlg.DoModal();
 }

@@ -7,3 +7,4 @@
 /injectdll/
 /Debug/
 /test_propertysheet/
+*.user

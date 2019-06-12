@@ -79,6 +79,7 @@ protected:
 
     afx_msg void    OnMenu_RemoteThreadInject();      //进程列表
     afx_msg void    OnMenu_EntryInject();   //入口注入方式
+    afx_msg void    OnAbout();
 	DECLARE_MESSAGE_MAP()
 };
 

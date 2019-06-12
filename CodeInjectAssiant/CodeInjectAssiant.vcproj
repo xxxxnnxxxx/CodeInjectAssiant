@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Dlg_About.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DlgProcList.cpp"
 				>
 			</File>
@@ -247,6 +251,10 @@
 			</File>
 			<File
 				RelativePath=".\DataHeader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Dlg_About.h"
 				>
 			</File>
 			<File
@@ -292,11 +300,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Refrence_code\drag.ico"
+				RelativePath=".\res\drag.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\res\drag.ico"
+				RelativePath="..\..\Refrence_code\drag.ico"
 				>
 			</File>
 			<File
@@ -312,19 +320,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\eye.ico"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Refrence_code\eye.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Refrence_code\list.ico"
+				RelativePath=".\res\eye.ico"
 				>
 			</File>
 			<File
 				RelativePath=".\res\list.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Refrence_code\list.ico"
 				>
 			</File>
 		</Filter>

@@ -227,7 +227,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "入口点注入",                       ID_MENU_ENTRYINJECT
     END
-    MENUITEM "关于(&A)",                      0
+    MENUITEM "关于(&A)",                      ID_MENU_About
 END
 
 
